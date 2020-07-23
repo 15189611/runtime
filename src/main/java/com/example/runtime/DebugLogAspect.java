@@ -17,6 +17,17 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 public class DebugLogAspect {
     private static volatile boolean enabled = true;
+    private static final String TAG = DebugLogAspect.class.getSimpleName();
+
+    @Pointcut("within(@com.example.annotations.DebugLog *)")
+    public void withinAnnotatedClass() {
+    }
+
+    @Pointcut("execution(!synthetic * *(..)) && withinAnnotatedClass()")
+    public void methodInsideAnnotatedType() {}
+
+    @Pointcut("execution(!synthetic *.new(..)) && withinAnnotatedClass()")
+    public void constructorInsideAnnotatedType() {}
 
     // 语法：execution(@注解 访问权限 返回值的类型 包名.函数名(参数))
     // 表示：使用DebugLog注解的任意类型返回值任意方法名（任意参数）
@@ -28,10 +39,6 @@ public class DebugLogAspect {
     public void constructor() {
     }
 
-    @Pointcut("within(@com.example.annotations.DebugLog *)")
-    public void withinAnnotatedClass() {
-    }
-
     public static void setEnabled(boolean enabled) {
         DebugLogAspect.enabled = enabled;
     }
@@ -40,7 +47,7 @@ public class DebugLogAspect {
     //Advance比较常用的有：Before():方法执行前,After():方法执行后,Around():代替原有逻辑
     @Around("method() || constructor()")
     public Object logAndExecute(ProceedingJoinPoint joinPoint) throws Throwable {
-        Log.e("Charles","方法进入");
+        Log.e(TAG,"LogExecute method is start");
         enterMethod(joinPoint); //原方法之前加入逻辑
         long startNanos = System.nanoTime();
         //执行原方法体

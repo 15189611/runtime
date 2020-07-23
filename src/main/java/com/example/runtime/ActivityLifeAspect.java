@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 
@@ -14,16 +13,13 @@ import com.example.annotations.ActivityAutoStart;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.CodeSignature;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Author: Charles.pan
@@ -40,14 +36,6 @@ import java.util.concurrent.TimeUnit;
 public class ActivityLifeAspect {
     private static final String TAG = ActivityLifeAspect.class.getSimpleName();
     private static volatile boolean enabled = true;
-
-    @Pointcut("execution(* *(..)) && withinAnnotatedClass()")
-    public void methodInsideAnnotatedType() {
-    }
-
-    @Pointcut("execution(*.new(..)) && withinAnnotatedClass()")
-    public void constructorInsideAnnotatedType() {
-    }
 
     @Pointcut("execution(@com.example.annotations.ActivityAutoStart * *(..))")
     public void lifeAnnotation() {

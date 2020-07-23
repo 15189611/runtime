@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
+apply plugin: 'com.novoda.bintray-release' // 添加bintray插件
 
 android {
     compileSdkVersion 30
@@ -46,6 +46,25 @@ dependencies {
 }
 
 
+// 定义两个链接，下面会用到。
+def siteUrl = 'https://github.com/15189611/runtime' // 项目主页。
+def gitUrl = 'https://github.com/15189611/runtime.git' // Git仓库的url。
+// 项目引用的版本号
+version = "1.0.0"
+// 唯一包名，比如compile 'com.charles:annotations:1.0.0'中的com.charles就是这里配置的。
+group = "com.charles"
+
+publish{
+    userOrg = 'mcharles'//bintray.com用户名
+    repoName = 'myRuntime'
+    groupId = group //jcenter上的路径
+    artifactId = 'myRuntime'//  与jcenter 项目名称一致
+    publishVersion = version //版本号
+    desc = 'Oh hi, this is a nice description for a project, right?'//描述，不重要
+    website = siteUrl //网站，不重要；尽量模拟github上的地址，例如我这样的；当然你有地址最好了
+}
+
+
 import org.aspectj.bridge.IMessage
 import org.aspectj.bridge.MessageHandler
 import org.aspectj.tools.ajc.Main
@@ -54,11 +73,10 @@ import org.aspectj.tools.ajc.Main
 //final def variants = project.android.applicationVariants
 //variants.all
 //module 用这种方式
-//final def variants = android.libraryVariants.all
+//final def variants = project.android.libraryVariants.all
 //variants.all
 
-
-android.libraryVariants.all { variant ->
+project.android.libraryVariants.all { variant ->
     JavaCompile javaCompile = variant.javaCompile
     javaCompile.doLast {
         String[] args = [
@@ -71,10 +89,13 @@ android.libraryVariants.all { variant ->
                 "-bootclasspath", android.bootClasspath.join(File.pathSeparator)
         ]
 
+        def log = project.logger
+        println "ajc args: " + Arrays.toString(args)
+        println 'A message Charles'
+
         MessageHandler handler = new MessageHandler(true);
         new Main().run(args, handler)
 
-        def log = project.logger
         for (IMessage message : handler.getMessages(null, true)) {
             switch (message.getKind()) {
                 case IMessage.ABORT:
